@@ -8,12 +8,11 @@ module Trifle
   module Docs
     module Harvester
       class Markdown
-        attr_reader :path, :mapping, :collections
+        attr_reader :path, :mapping
 
         def initialize(**keywords)
           @path = keywords.fetch(:path)
           @mapping = {}
-          @collections = Hash.new { |h, k| h[k] = [] }
 
           gather
         end
@@ -22,19 +21,25 @@ module Trifle
           Dir["#{path}/**/*.md"].each do |file|
             routing = Trifle::Docs::Helper::Routing.new(path: path, file: file)
             @mapping[routing.to_url] = file
-            next unless file.start_with?("#{path}/collections")
-
-            @collections[routing.to_collection] << YAML.load_file(file).merge(
-              'url' => routing.to_url
-            )
           end
           true
         end
 
-        def metadata_for(url: nil, file: nil)
+        def sitemap
+          meta_mapping = mapping.keys.each_with_object({}) do |url, out|
+            out[url] = meta_for(url: url)
+          end
+
+          Trifle::Docs::Helper::Tree.new(mapping: meta_mapping).menu
+        end
+
+        def meta_for(url: nil, file: nil)
           return nil if url.nil? && file.nil?
 
-          YAML.load_file(file || mapping[url])
+          YAML.load_file(file || mapping[url]).merge(
+            'url' => "/#{url}",
+            'breadcrumbs' => url.split('/')
+          )
         end
 
         def content_for(url: nil, file: nil)
@@ -42,6 +47,14 @@ module Trifle
 
           markdown.render(read(file: file || mapping[url]))
         end
+
+        def collection_for(url:)
+          return sitemap if url.empty?
+
+          sitemap.dig(*url.split('/'))
+        end
+
+        private
 
         def read(file:)
           File.read(file).gsub(/^---(.*?)---(\s*)/m, '')

@@ -11,13 +11,8 @@ module Trifle
           @file = file
         end
 
-        def to_collection
-          file.gsub(%r{^#{path}/collections/}, '').split('/').first
-        end
-
         def to_url
-          file.gsub(%r{^#{path}/pages/}, '')
-              .gsub(%r{^#{path}/collections/}, '')
+          file.gsub(%r{^#{path}/}, '')
               .gsub(%r{/?index\.md}, '')
               .gsub(/\.md/, '')
         end
