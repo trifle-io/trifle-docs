@@ -1,32 +1,114 @@
 # Trifle::Docs
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/trifle/docs`. To experiment with that code, run `bin/console` for an interactive prompt.
+[![Gem Version](https://badge.fury.io/rb/trifle-docs.svg)](https://badge.fury.io/rb/trifle-docs)
+![Ruby](https://github.com/trifle-io/trifle-docs/workflows/Ruby/badge.svg?branch=main)
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/trifle-io/trifle-docs)
 
-TODO: Delete this and the text above, and describe your gem
+Simple documentation backend for your markdown files.
+
+Integrate your documentation or blog into your existing Rails application. `Trifle::Docs` maps your docs folder full of markdown files to your URLs and allows you to integrate it with same layout as the rest of your app.
+
+![Demo App](demo.gif)
 
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add trifle-docs
+```sh
+$ bundle add trifle-docs
+```
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install trifle-docs
+```sh
+$ gem install trifle-docs
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+You can use this as a build-in Sinatra app or mount it in your Rails app.
+
+Sinatra configuration requires simple integration in your ruby file.
+
+```ruby
+# app.rb
+require 'trifle/docs'
+
+Trifle::Docs.configure do |config|
+  config.harvester = Trifle::Docs::Harvester::Markdown.new(path: File.join(__dir__, 'docs'))
+  config.templates = File.join(__dir__, 'templates')
+end
+
+Trifle::Docs.App.run!
+```
+
+Rails configuration requires initializer and routes configuration.
+
+```ruby
+# config/initializers/trifle.rb
+Trifle::Docs.configure do |config|
+  config.harvester = Trifle::Docs::Harvester::Markdown.new(path: File.join(Rails.root, 'docs'))
+  config.templates = File.join(Rails.root, 'app', 'views', 'trifle', 'docs')
+end
+
+# config/routes.rb
+MyRailsApp::Application.routes.draw do
+  # ...
+  mount Trifle::Docs::App.new => '/docs'
+  # ...
+end
+```
+
+Or use individual configuration per mount.
+
+```ruby
+# config/routes.rb
+MyRailsApp::Application.routes.draw do
+  # ...
+  mount Trifle::Docs::App.new => '/docs'
+  mount Trifle::Docs::App.new => '/blog'
+  # ...
+end
+```
+
+### Templates
+
+Please create two files in folder you provided the configuration.
+
+```ruby
+# templates/layout.erb
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Trifle::Docs</title>
+  </head>
+  <body>
+    <%= yield %>
+  </body>
+</html>
+
+# templates/page.erb
+<%= content %>
+```
+
+### Template variables
+There are several variables available in your template file (except `layout.erb`).
+- `sitemap` - complete sitemap tree of the folder.
+- `collection` - current subtree of the folder (useful for rendering child content, aka collection).
+- `content` - rendered markdown file.
+- `meta` - metadata from markdown file.
 
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
+You can test the sinatra app by running `bin/docs` that uses `templates/simple` templates to render `docs` files.
+
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/trifle-docs. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/trifle-docs/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/trifle-io/trifle-docs. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/trifle-io/trifle-docs/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -34,4 +116,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Trifle::Docs project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/trifle-docs/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Trifle::Docs project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/trifle-io/trifle-docs/blob/master/CODE_OF_CONDUCT.md).
