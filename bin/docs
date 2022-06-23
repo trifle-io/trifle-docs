@@ -8,7 +8,7 @@ require 'byebug'
 
 Trifle::Docs.configure do |config|
   config.harvester = Trifle::Docs::Harvester::Markdown.new(path: 'docs')
-  config.templates = File.join(__dir__, '..', 'templates', 'simple', 'app', 'views', 'trifle', 'docs')
+  config.templates = File.join(__dir__, '..', 'templates', 'simple')
 end
 
 Trifle::Docs::App.run!
