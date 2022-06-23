@@ -13,7 +13,7 @@ module Trifle
         def menu
           @menu ||= mapping.inject({}) do |out, (url, meta)|
             deep_merge(
-              out, url.split('/').reverse.inject({'_meta' => meta}) { |o, k| { k => o } }
+              out, url.split('/').reverse.inject({ '_meta' => meta }) { |o, k| { k => o } }
             )
           end
         end
