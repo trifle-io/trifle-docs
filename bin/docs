@@ -4,5 +4,11 @@
 require "bundler/setup"
 require "trifle/docs"
 require 'puma'
+require 'byebug'
+
+Trifle::Docs.configure do |config|
+  config.harvester = Trifle::Docs::Harvester::Markdown.new(path: 'docs')
+  config.templates = File.join(__dir__, '..', 'templates', 'simple', 'app', 'views', 'trifle', 'docs')
+end
 
 Trifle::Docs::App.run!

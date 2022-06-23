@@ -1,5 +1,6 @@
 ---
 title: 'Rugby Team'
+nav_order: 2
 ---
 
 # Rugby Team

@@ -1,5 +1,6 @@
 ---
 title: 'Kindergarden Project'
+nav_order: 3
 ---
 
 # Kindergarden Project

@@ -1,8 +1,8 @@
 ---
-title: case
+title: Case
 nav_order: 2
 ---
 
-# case
+# Case
 
 This is case documentation
