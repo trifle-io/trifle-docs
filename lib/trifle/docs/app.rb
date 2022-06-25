@@ -11,13 +11,19 @@ module Trifle
       end
 
       get '/*' do
-        meta = Trifle::Docs.meta(url: params['splat'].first)
-        erb (meta['template'] || 'page').to_sym, {}, {
-          sitemap: Trifle::Docs.sitemap,
-          collection: Trifle::Docs.collection(url: params['splat'].first),
-          content: Trifle::Docs.page(url: params['splat'].first),
-          meta: meta
-        }
+        url = params['splat'].first
+        meta = Trifle::Docs.meta(url: url)
+        if meta['type'] == 'file'
+          send_file meta['path']
+        else
+          erb (meta['template'] || 'page').to_sym, {}, {
+            sitemap: Trifle::Docs.sitemap,
+            collection: Trifle::Docs.collection(url: url),
+            content: Trifle::Docs.content(url: url),
+            meta: meta,
+            url: url
+          }
+        end
       end
     end
   end

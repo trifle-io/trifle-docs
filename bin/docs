@@ -7,8 +7,10 @@ require 'puma'
 require 'byebug'
 
 Trifle::Docs.configure do |config|
-  config.harvester = Trifle::Docs::Harvester::Markdown.new(path: 'docs')
+  config.path = 'docs'
   config.templates = File.join(__dir__, '..', 'templates', 'simple')
+  config.register_harvester(Trifle::Docs::Harvester::Markdown)
+  config.register_harvester(Trifle::Docs::Harvester::File)
 end
 
 Trifle::Docs::App.run!

@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require_relative 'docs/configuration'
-require_relative 'docs/helper/routing'
 require_relative 'docs/helper/tree'
+require_relative 'docs/harvester'
+require_relative 'docs/harvester/file'
 require_relative 'docs/harvester/markdown'
-require_relative 'docs/operations/page'
+require_relative 'docs/operations/content'
+require_relative 'docs/operations/toc'
 require_relative 'docs/operations/collection'
 require_relative 'docs/operations/meta'
 require_relative 'docs/operations/sitemap'
@@ -25,8 +27,8 @@ module Trifle
       default
     end
 
-    def self.page(url:, config: nil)
-      Trifle::Docs::Operations::Page.new(
+    def self.content(url:, config: nil)
+      Trifle::Docs::Operations::Content.new(
         url: url, config: config
       ).perform
     end
@@ -50,8 +52,3 @@ module Trifle
     end
   end
 end
-
-# Trifle::Docs.configure do |config|
-#   config.harvester = Trifle::Docs::Harvester::Markdown.new(path: 'docs')
-# end
-# Trifle::Docs.page()

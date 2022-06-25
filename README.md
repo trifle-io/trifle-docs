@@ -35,8 +35,10 @@ Sinatra configuration requires simple integration in your ruby file.
 require 'trifle/docs'
 
 Trifle::Docs.configure do |config|
-  config.harvester = Trifle::Docs::Harvester::Markdown.new(path: File.join(__dir__, 'docs'))
-  config.templates = File.join(__dir__, 'templates')
+  config.path = 'docs'
+  config.templates = File.join(__dir__, '..', 'templates', 'simple')
+  config.register_harvester(Trifle::Docs::Harvester::Markdown)
+  config.register_harvester(Trifle::Docs::Harvester::File)
 end
 
 Trifle::Docs.App.run!
@@ -47,8 +49,10 @@ Rails configuration requires initializer and routes configuration.
 ```ruby
 # config/initializers/trifle.rb
 Trifle::Docs.configure do |config|
-  config.harvester = Trifle::Docs::Harvester::Markdown.new(path: File.join(Rails.root, 'docs'))
+  config.path = File.join(Rails.root, 'docs')
   config.templates = File.join(Rails.root, 'app', 'views', 'trifle', 'docs')
+  config.register_harvester(Trifle::Docs::Harvester::Markdown)
+  config.register_harvester(Trifle::Docs::Harvester::File)
 end
 
 # config/routes.rb

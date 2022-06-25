@@ -3,7 +3,7 @@
 module Trifle
   module Docs
     module Operations
-      class Page
+      class Content
         attr_reader :url
 
         def initialize(**keywords)
