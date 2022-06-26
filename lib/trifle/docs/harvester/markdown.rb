@@ -22,7 +22,8 @@ module Trifle
         class Conveyor < Harvester::Conveyor
           def content
             @content ||= Redcarpet::Markdown.new(
-              Redcarpet::Render::HTML.new(with_toc_data: true)
+              Redcarpet::Render::HTML.new(with_toc_data: true),
+              fenced_code_blocks: true, disable_indented_code_blocks: true, footnotes: true
             ).render(data.gsub(/^---(.*?)---(\s*)/m, ''))
           end
 
