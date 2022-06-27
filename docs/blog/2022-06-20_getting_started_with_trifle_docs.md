@@ -18,3 +18,24 @@ Yeah, lets do that
 ## Or maybe no
 
 Ok.
+
+```ruby
+require 'rest-client'
+
+module Cron
+  class SubmitSomethingWorker
+    include Sidekiq::Worker
+
+    def perform(some_id)
+      Rails.logger.info "Start processing"
+      something = Something.find(some_id)
+      Rails.logger.info "Found record in DB"
+      body = { code: something.code, count: 100 }
+      Rails.logger.info "Sending payload: #{body}"
+
+      RestClient.post('http://example.com/something', body)
+      Rails.logger.info "Done?"
+    end
+  end
+end
+```
