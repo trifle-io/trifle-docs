@@ -32,11 +32,11 @@ module Trifle
               fenced_code_blocks: true,
               disable_indented_code_blocks: true,
               footnotes: true
-            ).render(data.gsub(/^---(.*?)---(\s*)/m, ''))
+            ).render(data.sub(/^---(.*?)---(\s*)/m, ''))
           end
 
           def meta
-            @meta ||= YAML.load_file(file).merge(
+            @meta ||= (YAML.safe_load(data[/^---(.*?)---(\s*)/m].to_s) || {}).merge(
               'url' => "/#{url}",
               'breadcrumbs' => url.split('/'),
               'toc' => toc
@@ -46,7 +46,7 @@ module Trifle
           def toc
             @toc ||= Redcarpet::Markdown.new(
               Redcarpet::Render::HTML_TOC
-            ).render(data.gsub(/^---(.*?)---(\s*)/m, ''))
+            ).render(data.sub(/^---(.*?)---(\s*)/m, ''))
           end
         end
       end

@@ -1,0 +1,1 @@
+This is a sample with only text
