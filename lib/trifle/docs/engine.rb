@@ -33,8 +33,8 @@ if Object.const_defined?('Rails')
           "layouts/trifle/docs/#{configuration.layout}"
         end
 
-        def show # rubocop:disable Metrics/MethodLength:
-          url = ([params[:url], params[:format]].compact.join('.'))
+        def show
+          url = [params[:url], params[:format]].compact.join('.')
           meta = Trifle::Docs.meta(url: url, config: configuration)
           render_file(meta: meta) and return if meta['type'] == 'file'
 
