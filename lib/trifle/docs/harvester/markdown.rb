@@ -37,7 +37,7 @@ module Trifle
 
           def meta
             @meta ||= (YAML.safe_load(data[/^---(.*?)---(\s*)/m].to_s) || {}).merge(
-              'url' => "/#{url}",
+              'url' => "/#{[namespace, url].compact.join('/')}",
               'breadcrumbs' => url.split('/'),
               'toc' => toc
             )

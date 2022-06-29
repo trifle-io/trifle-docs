@@ -3,17 +3,19 @@
 module Trifle
   module Docs
     class Configuration
-      attr_accessor :path, :templates
+      attr_accessor :path, :views, :layout, :namespace
 
       def initialize
         @harvesters = []
         @path = nil
+        @namespace = nil
       end
 
       def harvester
         @harvester ||= Trifle::Docs::Harvester::Walker.new(
           path: path,
-          harvesters: @harvesters
+          harvesters: @harvesters,
+          namespace: namespace
         )
       end
 

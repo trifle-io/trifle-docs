@@ -7,7 +7,7 @@ module Trifle
     class App < Sinatra::Base
       configure do
         set :bind, '0.0.0.0'
-        set :views, proc { Trifle::Docs.default.templates }
+        set :views, proc { Trifle::Docs.default.views }
       end
 
       get '/*' do

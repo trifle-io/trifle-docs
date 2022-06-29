@@ -10,7 +10,9 @@ require_relative 'docs/operations/collection'
 require_relative 'docs/operations/meta'
 require_relative 'docs/operations/sitemap'
 require_relative 'docs/version'
-require_relative 'docs/app' # NOTE: Load app last
+# NOTE: Load app and engine last
+require_relative 'docs/app'
+require_relative 'docs/engine'
 
 module Trifle
   module Docs

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    trifle-docs (0.1.1)
+    trifle-docs (0.2.0)
       redcarpet
       rouge
       sinatra

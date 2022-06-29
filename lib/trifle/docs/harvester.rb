@@ -4,11 +4,12 @@ module Trifle
   module Docs
     module Harvester
       class Walker
-        attr_reader :path, :router
+        attr_reader :path, :router, :namespace
 
         def initialize(**keywords)
           @path = keywords.fetch(:path)
           @harvesters = keywords.fetch(:harvesters)
+          @namespace = keywords.fetch(:namespace)
           @router = {}
 
           gather
@@ -19,7 +20,7 @@ module Trifle
             @harvesters.each do |harvester|
               sieve = harvester::Sieve.new(path: path, file: file)
               if sieve.match?
-                @router[sieve.to_url] = harvester::Conveyor.new(file: file, url: sieve.to_url)
+                @router[sieve.to_url] = harvester::Conveyor.new(file: file, url: sieve.to_url, namespace: namespace)
                 break
               end
             end
@@ -70,11 +71,12 @@ module Trifle
       end
 
       class Conveyor
-        attr_reader :file, :url
+        attr_reader :file, :url, :namespace
 
-        def initialize(file:, url:)
+        def initialize(file:, url:, namespace:)
           @file = file
           @url = url
+          @namespace = namespace
         end
 
         def data
