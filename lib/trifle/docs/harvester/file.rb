@@ -23,7 +23,7 @@ module Trifle
             {
               'path' => file,
               'type' => 'file',
-              'updated_at' => File.stat(file).mtime
+              'updated_at' => ::File.stat(file).mtime
             }
           end
         end

@@ -53,7 +53,7 @@ module Trifle
         end
 
         def route_for(url:)
-          @router[url] ? not_found(url: url) : @router[url]
+          @router[url] ? @router[url] : not_found(url: url)
         end
 
         def not_found(url:)

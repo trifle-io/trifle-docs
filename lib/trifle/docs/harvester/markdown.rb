@@ -40,7 +40,7 @@ module Trifle
               'url' => "/#{[namespace, url].compact.join('/')}",
               'breadcrumbs' => url.split('/'),
               'toc' => toc,
-              'updated_at' => File.stat(file).mtime
+              'updated_at' => ::File.stat(file).mtime
             )
           end
 
