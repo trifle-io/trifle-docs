@@ -45,11 +45,19 @@ module Trifle
         end
 
         def content_for(url:)
-          @router[url].content
+          route_for(url: url)&.content
         end
 
         def meta_for(url:)
-          @router[url].meta
+          route_for(url: url)&.meta
+        end
+
+        def route_for(url:)
+          @router[url] ? not_found(url: url) : @router[url]
+        end
+
+        def not_found(url:)
+          puts "No route found for url: #{url}"
         end
       end
 
