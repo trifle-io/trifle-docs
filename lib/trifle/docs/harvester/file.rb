@@ -22,7 +22,8 @@ module Trifle
           def meta
             {
               'path' => file,
-              'type' => 'file'
+              'type' => 'file',
+              'updated_at' => File.stat(file).mtime
             }
           end
         end

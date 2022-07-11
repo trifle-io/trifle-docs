@@ -39,7 +39,8 @@ module Trifle
             @meta ||= (YAML.safe_load(data[/^---(.*?)---(\s*)/m].to_s) || {}).merge(
               'url' => "/#{[namespace, url].compact.join('/')}",
               'breadcrumbs' => url.split('/'),
-              'toc' => toc
+              'toc' => toc,
+              'updated_at' => File.stat(file).mtime
             )
           end
 
