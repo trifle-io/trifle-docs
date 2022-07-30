@@ -10,6 +10,11 @@ Integrate your documentation or blog into your existing Rails application. `Trif
 
 ![Demo App](demo.gif)
 
+
+## Documentation
+
+You can find guides and documentation at https://trifle.io/trifle-docs
+
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
@@ -26,9 +31,7 @@ $ gem install trifle-docs
 
 ## Usage
 
-You can use this as a build-in Sinatra app or mount it in your Rails app.
-
-Sinatra configuration requires simple integration in your ruby file.
+You can use this as a build-in Sinatra app or mount it in your Rails app. For each usecse, refere to documentation. Below is sample Sinatra integration.
 
 ```ruby
 # app.rb
@@ -42,37 +45,6 @@ Trifle::Docs.configure do |config|
 end
 
 Trifle::Docs.App.run!
-```
-
-Rails configuration requires initializer and routes configuration.
-
-```ruby
-# config/initializers/trifle.rb
-Trifle::Docs.configure do |config|
-  config.path = File.join(Rails.root, 'docs')
-  config.templates = File.join(Rails.root, 'app', 'views', 'trifle', 'docs')
-  config.register_harvester(Trifle::Docs::Harvester::Markdown)
-  config.register_harvester(Trifle::Docs::Harvester::File)
-end
-
-# config/routes.rb
-MyRailsApp::Application.routes.draw do
-  # ...
-  mount Trifle::Docs::App.new => '/docs'
-  # ...
-end
-```
-
-Or use individual configuration per mount.
-
-```ruby
-# config/routes.rb
-MyRailsApp::Application.routes.draw do
-  # ...
-  mount Trifle::Docs::App.new => '/docs'
-  mount Trifle::Docs::App.new => '/blog'
-  # ...
-end
 ```
 
 ### Templates
@@ -96,6 +68,7 @@ Please create two files in folder you provided the configuration.
 ```
 
 ### Template variables
+
 There are several variables available in your template file (except `layout.erb`).
 - `sitemap` - complete sitemap tree of the folder.
 - `collection` - current subtree of the folder (useful for rendering child content, aka collection).
