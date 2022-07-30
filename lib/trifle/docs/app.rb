@@ -13,6 +13,8 @@ module Trifle
       get '/*' do
         url = params['splat'].first.chomp('/')
         meta = Trifle::Docs.meta(url: url)
+        halt(404, 'Not Found') if meta.nil?
+
         if meta['type'] == 'file'
           send_file meta['path']
         else

@@ -36,9 +36,14 @@ if Object.const_defined?('Rails')
         def show
           url = [params[:url], params[:format]].compact.join('.')
           meta = Trifle::Docs.meta(url: url, config: configuration)
+          render_not_found and return if meta.nil?
           render_file(meta: meta) and return if meta['type'] == 'file'
 
           render_content(url: url, meta: meta)
+        end
+
+        def render_not_found
+          render text: 'Not Found', status: 404
         end
 
         def render_file(meta:)
