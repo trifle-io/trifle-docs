@@ -10,6 +10,7 @@ AllCops:
     - 'spec/**/*'
     - 'Gemfile'
     - trifle-docs.gemspec
+    - website/**/*
 
 Style/Documentation:
   Enabled: false
