@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = 'https://github.com/trifle-io/trifle-docs'
-  spec.metadata["changelog_uri"] = "https://github.com/trifle-io/trifle-docs/blob/main/CHANGELOG.md"
+  spec.metadata['changelog_uri'] = 'https://trifle.io/trifle-docs/changelog'
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
