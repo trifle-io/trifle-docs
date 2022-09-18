@@ -4,25 +4,28 @@ module Trifle
   module Docs
     module Harvester
       class Walker
-        attr_reader :path, :router, :namespace
+        attr_reader :path, :router, :namespace, :cache
 
         def initialize(**keywords)
           @path = keywords.fetch(:path)
           @harvesters = keywords.fetch(:harvesters)
           @namespace = keywords.fetch(:namespace)
+          @cache = keywords.fetch(:cache)
           @router = {}
 
           gather
         end
 
-        def gather
+        def gather # rubocop:disable Metrics/MethodLength
           Dir["#{path}/**/*.*"].each do |file|
             @harvesters.each do |harvester|
               sieve = harvester::Sieve.new(path: path, file: file)
-              if sieve.match?
-                @router[sieve.to_url] = harvester::Conveyor.new(file: file, url: sieve.to_url, namespace: namespace)
-                break
-              end
+              next unless sieve.match?
+
+              @router[sieve.to_url] = harvester::Conveyor.new(
+                file: file, url: sieve.to_url, namespace: namespace, cache: cache
+              )
+              break
             end
           end
           true
@@ -79,15 +82,18 @@ module Trifle
       end
 
       class Conveyor
-        attr_reader :file, :url, :namespace
+        attr_reader :file, :url, :namespace, :cache
 
-        def initialize(file:, url:, namespace:)
+        def initialize(file:, url:, namespace:, cache:)
           @file = file
           @url = url
           @namespace = namespace
+          @cache = cache
         end
 
         def data
+          @data = nil unless cache
+
           @data ||= ::File.read(file)
         end
       end

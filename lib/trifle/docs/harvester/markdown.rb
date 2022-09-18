@@ -27,6 +27,8 @@ module Trifle
 
         class Conveyor < Harvester::Conveyor
           def content
+            @content = nil unless cache
+
             @content ||= Redcarpet::Markdown.new(
               Render.new(with_toc_data: true),
               fenced_code_blocks: true,
@@ -36,6 +38,8 @@ module Trifle
           end
 
           def meta
+            @meta = nil unless cache
+
             @meta ||= (YAML.safe_load(data[/^---(.*?)---(\s*)/m].to_s) || {}).merge(
               'url' => "/#{[namespace, url].compact.join('/')}",
               'breadcrumbs' => url.split('/'),
@@ -45,6 +49,8 @@ module Trifle
           end
 
           def toc
+            @toc = nil unless cache
+
             @toc ||= Redcarpet::Markdown.new(
               Redcarpet::Render::HTML_TOC
             ).render(data.sub(/^---(.*?)---(\s*)/m, ''))
