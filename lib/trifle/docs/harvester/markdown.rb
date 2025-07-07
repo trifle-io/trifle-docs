@@ -33,7 +33,8 @@ module Trifle
               Render.new(with_toc_data: true),
               fenced_code_blocks: true,
               disable_indented_code_blocks: true,
-              footnotes: true
+              footnotes: true,
+              tables: true
             ).render(data.sub(/^---(.*?)---(\s*)/m, ''))
           rescue StandardError => e
             puts "Markdown: Failed to parse CONTENT for #{file}: #{e}"
