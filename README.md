@@ -1,53 +1,79 @@
 # Trifle::Docs
 
-[![Gem Version](https://badge.fury.io/rb/trifle-docs.svg)](https://badge.fury.io/rb/trifle-docs)
-![Ruby](https://github.com/trifle-io/trifle-docs/workflows/Ruby/badge.svg?branch=main)
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/trifle-io/trifle-docs)
+[![Gem Version](https://badge.fury.io/rb/trifle-docs.svg)](https://rubygems.org/gems/trifle-docs)
+[![Ruby](https://github.com/trifle-io/trifle-docs/workflows/Ruby/badge.svg?branch=main)](https://github.com/trifle-io/trifle-docs)
 
-Simple documentation backend for your markdown files.
-
-Integrate your documentation or blog into your existing Rails application. `Trifle::Docs` maps your docs folder full of markdown files to your URLs and allows you to integrate it with same layout as the rest of your app.
-
-![Demo App](demo.gif)
-
+Simple router for your static documentation. Like markdown, or textile, or whatever files. It maps your docs folder structure into URLs and renders them within the simplest template possible.
 
 ## Documentation
 
-You can find guides and documentation at https://trifle.io/trifle-docs
+For comprehensive guides, API reference, and examples, visit [trifle.io/trifle-docs](https://trifle.io/trifle-docs)
+
+![Demo App](demo.gif)
 
 ## Installation
 
-Install the gem and add to the application's Gemfile by executing:
+Add this line to your application's Gemfile:
 
-```sh
-$ bundle add trifle-docs
+```ruby
+gem 'trifle-docs'
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+And then execute:
 
-```sh
+```bash
+$ bundle install
+```
+
+Or install it yourself as:
+
+```bash
 $ gem install trifle-docs
 ```
 
-## Usage
+## Quick Start
 
-You can use this as a build-in Sinatra app or mount it in your Rails app. For each usecse, refere to documentation. Below is sample Sinatra integration.
+### 1. Configure
 
 ```ruby
-# app.rb
 require 'trifle/docs'
 
 Trifle::Docs.configure do |config|
-  config.path = 'docs'
-  config.templates = File.join(__dir__, '..', 'templates', 'simple')
+  config.path = File.join(__dir__, 'docs')
+  config.views = File.join(__dir__, 'templates')
   config.register_harvester(Trifle::Docs::Harvester::Markdown)
   config.register_harvester(Trifle::Docs::Harvester::File)
 end
-
-Trifle::Docs.App.run!
 ```
 
-### Templates
+### 2. Create documentation structure
+
+```
+docs/
+├── index.md
+├── getting-started/
+│   ├── index.md
+│   └── installation.md
+└── api/
+    ├── index.md
+    └── reference.md
+```
+
+### 3. Use in your application
+
+```ruby
+# As Rack middleware
+use Trifle::Docs::Middleware
+
+# Or mount in Rails
+Rails.application.routes.draw do
+  mount Trifle::Docs::Engine => '/docs'
+end
+
+# Or Sinatra app
+```
+
+### 4. Templates
 
 Please create two files in folder you provided the configuration.
 
@@ -67,7 +93,7 @@ Please create two files in folder you provided the configuration.
 <%= content %>
 ```
 
-### Template variables
+#### Template variables
 
 There are several variables available in your template file (except `layout.erb`).
 - `sitemap` - complete sitemap tree of the folder.
@@ -75,22 +101,43 @@ There are several variables available in your template file (except `layout.erb`
 - `content` - rendered markdown file.
 - `meta` - metadata from markdown file.
 
-## Development
+## Features
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+- **File-based routing** - Maps folder structure to URL paths
+- **Multiple harvesters** - Markdown, textile, and custom file processors
+- **Template system** - ERB templates with layout support
+- **Flexible integration** - Works with Rack, Rails, Sinatra
+- **Caching support** - Optional caching for production environments
+- **Navigation helpers** - Automatic menu and breadcrumb generation
 
-You can test the sinatra app by running `bin/docs` that uses `templates/simple` templates to render `docs` files.
+## Harvesters
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Trifle::Docs supports multiple content processors:
+
+- **Markdown** - Process `.md` files with frontmatter support
+- **File** - Handle static assets and non-markdown content
+- **Custom** - Build your own harvesters for specialized content
+
+## Testing
+
+Tests focus on documenting behavior and ensuring reliability. To run the test suite:
+
+```bash
+$ bundle exec rspec
+```
+
+Tests are meant to be **simple and isolated**. Every test should be **independent** and able to run in any order. Tests should be **self-contained** and set up their own configuration.
+
+Use **single layer testing** to focus on testing a specific class or module in isolation. Use **appropriate stubbing** for file system operations when testing harvesters and routing logic.
+
+**Repeat yourself** in test setup for clarity rather than complex shared setups that can hide dependencies.
+
+Tests verify that file system changes are properly reflected in the documentation routing and that templates render correctly with provided content.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/trifle-io/trifle-docs. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/trifle-io/trifle-docs/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/trifle-io/trifle-docs.
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the Trifle::Docs project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/trifle-io/trifle-docs/blob/master/CODE_OF_CONDUCT.md).
