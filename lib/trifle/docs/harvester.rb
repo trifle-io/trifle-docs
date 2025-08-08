@@ -94,7 +94,7 @@ module Trifle
         def data
           @data = nil unless cache
 
-          @data ||= ::File.read(file)
+          @data ||= ::File.read(file, encoding: 'utf-8')
         end
       end
     end
