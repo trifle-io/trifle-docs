@@ -44,7 +44,7 @@ module Trifle
         def search_for(query:, limit: 10) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
           return [] if query.nil? || query.strip.empty?
 
-          query_terms = query.downcase.split(/\s+/)
+          query_terms = [query.downcase.strip]
           matches = []
 
           router.each do |url, conveyor|
