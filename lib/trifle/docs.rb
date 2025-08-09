@@ -5,6 +5,7 @@ require_relative 'docs/helper/tree'
 require_relative 'docs/harvester'
 require_relative 'docs/harvester/file'
 require_relative 'docs/harvester/markdown'
+require_relative 'docs/operations/search'
 require_relative 'docs/operations/content'
 require_relative 'docs/operations/collection'
 require_relative 'docs/operations/meta'
@@ -26,6 +27,12 @@ module Trifle
       yield(default)
 
       default
+    end
+
+    def self.search(query:, config: nil)
+      Trifle::Docs::Operations::Search.new(
+        query: query, config: config
+      ).perform
     end
 
     def self.content(url:, config: nil)

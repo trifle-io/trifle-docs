@@ -26,6 +26,11 @@ module Trifle
         end
 
         class Conveyor < Harvester::Conveyor
+          def initialize(**keywords)
+            super
+            preload_cache if cache
+          end
+
           def content
             @content = nil unless cache
 
@@ -67,6 +72,15 @@ module Trifle
             ).render(data.sub(/^---(.*?)---(\s*)/m, ''))
           rescue StandardError => e
             puts "Markdown: Failed to parse TOC for #{file}: #{e}"
+          end
+
+          private
+
+          def preload_cache
+            data
+            content
+            meta
+            toc
           end
         end
       end

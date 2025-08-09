@@ -10,6 +10,20 @@ module Trifle
         set :views, proc { Trifle::Docs.default.views }
       end
 
+      get '/search' do
+        results = Trifle::Docs.search(query: params['query'])
+        erb(
+          'search'.to_sym,
+          {},
+          {
+            results: results,
+            query: params['query'],
+            sitemap: Trifle::Docs.sitemap,
+            meta: { description: 'Search' }
+          }
+        )
+      end
+
       get '/*' do
         url = params['splat'].first.chomp('/')
         meta = Trifle::Docs.meta(url: url)
