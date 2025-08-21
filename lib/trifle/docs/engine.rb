@@ -17,6 +17,7 @@ if Object.const_defined?('Rails')
         def self.draw
           Trifle::Docs::Engine.routes.draw do
             root to: 'page#show'
+            get 'search', to: 'page#search'
             get '*url', to: 'page#show'
           end
         end
@@ -40,6 +41,18 @@ if Object.const_defined?('Rails')
           render_file(meta: meta) and return if meta['type'] == 'file'
 
           render_content(url: url, meta: meta)
+        end
+
+        def search
+          results = Trifle::Docs.search(query: params[:query], scope: params[:scope])
+
+          render 'search', locals: {
+            results: results,
+            query: params[:query],
+            scope: params[:scope],
+            sitemap: Trifle::Docs.sitemap,
+            meta: { description: 'Search' }
+          }
         end
 
         def render_not_found

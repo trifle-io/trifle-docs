@@ -29,9 +29,9 @@ module Trifle
       default
     end
 
-    def self.search(query:, config: nil)
+    def self.search(query:, scope: nil, config: nil)
       Trifle::Docs::Operations::Search.new(
-        query: query, config: config
+        query: query, scope: scope, config: config
       ).perform
     end
 

@@ -41,14 +41,16 @@ module Trifle
           end
         end
 
-        def search_for(query:, limit: 10) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
+        def search_for(query:, scope: nil, limit: 10) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
           return [] if query.nil? || query.strip.empty?
 
           query_terms = [query.downcase.strip]
           matches = []
 
-          router.each do |url, conveyor|
-            score = calculate_match_score(conveyor, query_terms)
+          searchable_routes = filter_searchable_routes(scope)
+
+          searchable_routes.each do |url, conveyor|
+            score = calculate_fuzzy_match_score(conveyor, query_terms)
             next if score.zero?
 
             matches << {
@@ -88,6 +90,49 @@ module Trifle
         end
 
         private
+
+        def filter_searchable_routes(scope)
+          router.select do |url, conveyor|
+            # Only include searchable harvesters (exclude File harvester)
+            searchable_conveyor?(conveyor) && (scope.nil? || url.start_with?(scope))
+          end
+        end
+
+        def searchable_conveyor?(conveyor)
+          # Include only conveyors that have searchable content (exclude File harvester)
+          conveyor.respond_to?(:content) && conveyor.respond_to?(:meta) &&
+            !conveyor.class.name.include?('File')
+        end
+
+        def calculate_fuzzy_match_score(conveyor, query_terms) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+          score = 0
+          searchable_content = extract_searchable_content(conveyor)
+          query = query_terms.first
+
+          # Fuzzy matching with different strategies
+          searchable_content.each do |field, content|
+            next if content.nil? || content.empty?
+
+            field_weight = get_field_weight(field)
+
+            # Exact match (highest score)
+            exact_matches = content.scan(/#{Regexp.escape(query)}/i).size
+            score += exact_matches * field_weight * 10
+
+            # Subsequence match (fzf-like)
+            score += field_weight * 5 if subsequence_match?(content, query)
+
+            # N-gram similarity
+            ngram_score = calculate_ngram_similarity(content, query)
+            score += (ngram_score * field_weight * 3).to_i
+
+            # Word boundary matches
+            word_matches = content.downcase.scan(/\b#{Regexp.escape(query)}\b/i).size
+            score += word_matches * field_weight * 8
+          end
+
+          score
+        end
 
         def calculate_match_score(conveyor, query_terms) # rubocop:disable Metrics/AbcSize
           score = 0
@@ -227,6 +272,52 @@ module Trifle
           end
 
           pos
+        end
+
+        def get_field_weight(field)
+          case field
+          when :title then 10
+          when :url then 8
+          when :tags then 7
+          when :meta then 5
+          when :content then 1
+          else 1
+          end
+        end
+
+        def subsequence_match?(text, pattern)
+          # fzf-like subsequence matching
+          text_idx = 0
+          pattern_idx = 0
+
+          while text_idx < text.length && pattern_idx < pattern.length
+            pattern_idx += 1 if text[text_idx].downcase == pattern[pattern_idx].downcase
+            text_idx += 1
+          end
+
+          pattern_idx == pattern.length
+        end
+
+        def calculate_ngram_similarity(text, pattern, n: 2) # rubocop:disable Naming/MethodParameterName
+          return 0 if text.length < n || pattern.length < n
+
+          text_ngrams = get_ngrams(text.downcase, n)
+          pattern_ngrams = get_ngrams(pattern.downcase, n)
+
+          return 0 if text_ngrams.empty? || pattern_ngrams.empty?
+
+          intersection = text_ngrams & pattern_ngrams
+          union = text_ngrams | pattern_ngrams
+
+          intersection.length.to_f / union.length
+        end
+
+        def get_ngrams(text, n) # rubocop:disable Naming/MethodParameterName
+          return [] if text.length < n
+
+          (0..text.length - n).map do |i|
+            text[i, n]
+          end
         end
 
         def strip_html(html)

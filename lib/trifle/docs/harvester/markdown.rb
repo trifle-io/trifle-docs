@@ -26,11 +26,6 @@ module Trifle
         end
 
         class Conveyor < Harvester::Conveyor
-          def initialize(**keywords)
-            super
-            preload_cache if cache
-          end
-
           def content
             @content = nil unless cache
 

@@ -11,13 +11,14 @@ module Trifle
       end
 
       get '/search' do
-        results = Trifle::Docs.search(query: params['query'])
+        results = Trifle::Docs.search(query: params['query'], scope: params['scope'])
         erb(
           'search'.to_sym,
           {},
           {
             results: results,
             query: params['query'],
+            scope: params['scope'],
             sitemap: Trifle::Docs.sitemap,
             meta: { description: 'Search' }
           }
