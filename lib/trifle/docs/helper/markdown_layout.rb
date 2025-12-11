@@ -6,7 +6,7 @@ module Trifle
       module MarkdownLayout
         module_function
 
-        def render(meta:, raw_content:, sitemap:)
+        def render(meta:, raw_content:, sitemap:) # rubocop:disable Metrics/MethodLength
           lines = []
           title = meta['title'] || derive_title_from_url(meta['url'])
 
@@ -22,7 +22,7 @@ module Trifle
           lines.join("\n")
         end
 
-        def navigation_toc(sitemap, depth: 0)
+        def navigation_toc(sitemap, depth: 0) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           return '' unless sitemap.is_a?(Hash)
 
           sitemap.keys.reject { |k| k == '_meta' }.sort.map do |key|

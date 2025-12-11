@@ -34,17 +34,13 @@ if Object.const_defined?('Rails')
           "layouts/trifle/docs/#{configuration.layout}"
         end
 
-        def show
+        def show # rubocop:disable Metrics/AbcSize
           url = [params[:url], params[:format]].compact.join('.')
           meta = Trifle::Docs.meta(url: url, config: configuration)
           render_not_found and return if meta.nil?
 
           if Trifle::Docs::Helper::AiDetection.ai_scraper?(request.user_agent) && meta['type'] != 'file'
-            render plain: Trifle::Docs::Helper::MarkdownLayout.render(
-              meta: meta,
-              raw_content: Trifle::Docs.raw_content(url: url, config: configuration),
-              sitemap: Trifle::Docs.sitemap(config: configuration)
-            ), content_type: 'text/markdown'
+            render_markdown(url: url, meta: meta)
             return
           end
           render_file(meta: meta) and return if meta['type'] == 'file'
@@ -80,6 +76,14 @@ if Object.const_defined?('Rails')
             meta: meta,
             url: url
           }
+        end
+
+        def render_markdown
+          render plain: Trifle::Docs::Helper::MarkdownLayout.render(
+            meta: meta,
+            raw_content: Trifle::Docs.raw_content(url: url, config: configuration),
+            sitemap: Trifle::Docs.sitemap(config: configuration)
+          ), content_type: 'text/markdown'
         end
       end
     end
