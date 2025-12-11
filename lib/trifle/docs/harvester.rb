@@ -77,6 +77,17 @@ module Trifle
           route_for(url: url)&.content
         end
 
+        def raw_content_for(url:)
+          conveyor = route_for(url: url)
+          return unless conveyor
+
+          if conveyor.respond_to?(:raw_content)
+            conveyor.raw_content
+          elsif conveyor.respond_to?(:content)
+            conveyor.content
+          end
+        end
+
         def meta_for(url:)
           route_for(url: url)&.meta
         end

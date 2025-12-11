@@ -30,6 +30,15 @@ module Trifle
         meta = Trifle::Docs.meta(url: url)
         halt(404, 'Not Found') if meta.nil?
 
+        if Trifle::Docs::Helper::AiDetection.ai_scraper?(request.user_agent) && meta['type'] != 'file'
+          content_type 'text/markdown'
+          return Trifle::Docs::Helper::MarkdownLayout.render(
+            meta: meta,
+            raw_content: Trifle::Docs.raw_content(url: url),
+            sitemap: Trifle::Docs.sitemap
+          )
+        end
+
         if meta['type'] == 'file'
           send_file meta['path']
         else

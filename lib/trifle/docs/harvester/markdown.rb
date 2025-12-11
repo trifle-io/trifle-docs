@@ -40,6 +40,14 @@ module Trifle
             puts "Markdown: Failed to parse CONTENT for #{file}: #{e}"
           end
 
+          def raw_content
+            @raw_content = nil unless cache
+
+            @raw_content ||= data.sub(/^---(.*?)---(\s*)/m, '').strip
+          rescue StandardError => e
+            puts "Markdown: Failed to load RAW CONTENT for #{file}: #{e}"
+          end
+
           def default_meta
             {
               'url' => "/#{[namespace, url].compact.join('/')}",
@@ -74,6 +82,7 @@ module Trifle
           def preload_cache
             data
             content
+            raw_content
             meta
             toc
           end

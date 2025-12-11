@@ -38,6 +38,15 @@ if Object.const_defined?('Rails')
           url = [params[:url], params[:format]].compact.join('.')
           meta = Trifle::Docs.meta(url: url, config: configuration)
           render_not_found and return if meta.nil?
+
+          if Trifle::Docs::Helper::AiDetection.ai_scraper?(request.user_agent) && meta['type'] != 'file'
+            render plain: Trifle::Docs::Helper::MarkdownLayout.render(
+              meta: meta,
+              raw_content: Trifle::Docs.raw_content(url: url, config: configuration),
+              sitemap: Trifle::Docs.sitemap(config: configuration)
+            ), content_type: 'text/markdown'
+            return
+          end
           render_file(meta: meta) and return if meta['type'] == 'file'
 
           render_content(url: url, meta: meta)

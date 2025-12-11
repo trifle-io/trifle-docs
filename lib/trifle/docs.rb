@@ -2,11 +2,14 @@
 
 require_relative 'docs/configuration'
 require_relative 'docs/helper/tree'
+require_relative 'docs/helper/markdown_layout'
+require_relative 'docs/helper/ai_detection'
 require_relative 'docs/harvester'
 require_relative 'docs/harvester/file'
 require_relative 'docs/harvester/markdown'
 require_relative 'docs/operations/search'
 require_relative 'docs/operations/content'
+require_relative 'docs/operations/raw_content'
 require_relative 'docs/operations/collection'
 require_relative 'docs/operations/meta'
 require_relative 'docs/operations/sitemap'
@@ -43,6 +46,12 @@ module Trifle
 
     def self.meta(url:, config: nil)
       Trifle::Docs::Operations::Meta.new(
+        url: url, config: config
+      ).perform
+    end
+
+    def self.raw_content(url:, config: nil)
+      Trifle::Docs::Operations::RawContent.new(
         url: url, config: config
       ).perform
     end
