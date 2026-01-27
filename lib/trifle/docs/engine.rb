@@ -17,6 +17,8 @@ if Object.const_defined?('Rails')
         def self.draw
           Trifle::Docs::Engine.routes.draw do
             root to: 'page#show'
+            get 'llms.txt', to: 'page#llms'
+            get 'llms-full.txt', to: 'page#llms_full'
             get 'search', to: 'page#search'
             get '*url', to: 'page#show'
           end
@@ -60,6 +62,38 @@ if Object.const_defined?('Rails')
           }
         end
 
+        def llms
+          meta = Trifle::Docs.meta(url: 'llms.txt', config: configuration)
+          if meta && meta['type'] == 'file'
+            send_file(meta['path'])
+            return
+          end
+
+          content = Trifle::Docs::Helper::Llms.homepage_markdown(config: configuration)
+          if content.nil?
+            render_not_found
+            return
+          end
+
+          render plain: content, content_type: 'text/markdown'
+        end
+
+        def llms_full
+          meta = Trifle::Docs.meta(url: 'llms-full.txt', config: configuration)
+          if meta && meta['type'] == 'file'
+            send_file(meta['path'])
+            return
+          end
+
+          content = Trifle::Docs::Helper::Llms.full_markdown(config: configuration)
+          if content.nil? || content.strip.empty?
+            render_not_found
+            return
+          end
+
+          render plain: content, content_type: 'text/markdown'
+        end
+
         def render_not_found
           render text: 'Not Found', status: 404
         end
@@ -78,7 +112,7 @@ if Object.const_defined?('Rails')
           }
         end
 
-        def render_markdown
+        def render_markdown(url:, meta:)
           render plain: Trifle::Docs::Helper::MarkdownLayout.render(
             meta: meta,
             raw_content: Trifle::Docs.raw_content(url: url, config: configuration),
