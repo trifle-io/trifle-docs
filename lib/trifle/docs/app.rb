@@ -47,32 +47,70 @@ module Trifle
         content
       end
 
+      get '/sitemap.xml' do
+        meta = Trifle::Docs.meta(url: 'sitemap.xml')
+        return send_file(meta['path']) if meta && meta['type'] == 'file'
+
+        render_generated_sitemap
+      end
+
       get '/*' do
+        handle_request(params, request)
+      end
+
+      def markdown_requested?(request, params)
+        return true if params['format'].to_s.downcase == 'md'
+
+        accept = request.env['HTTP_ACCEPT'].to_s
+        accept.include?('text/markdown')
+      end
+
+      def render_markdown?(meta, request, params)
+        return false if meta['type'] == 'file'
+
+        markdown_requested?(request, params) ||
+          Trifle::Docs::Helper::AiDetection.ai_scraper?(request.user_agent)
+      end
+
+      def handle_request(params, request)
         url = params['splat'].first.chomp('/')
         meta = Trifle::Docs.meta(url: url)
         halt(404, 'Not Found') if meta.nil?
 
-        if Trifle::Docs::Helper::AiDetection.ai_scraper?(request.user_agent) && meta['type'] != 'file'
-          content_type 'text/markdown'
-          return Trifle::Docs::Helper::MarkdownLayout.render(
-            meta: meta,
-            raw_content: Trifle::Docs.raw_content(url: url),
-            sitemap: Trifle::Docs.sitemap
-          )
-        end
+        return render_markdown(meta, url) if render_markdown?(meta, request, params)
+        return send_file(meta['path']) if meta['type'] == 'file'
 
-        if meta['type'] == 'file'
-          send_file meta['path']
-        else
-          erb (meta['template'] || 'page').to_sym, {}, {
-            sitemap: Trifle::Docs.sitemap,
-            collection: Trifle::Docs.collection(url: url),
-            content: Trifle::Docs.content(url: url),
-            meta: meta,
-            url: url
-          }
-        end
+        render_html(meta, url)
       end
+
+      def render_markdown(meta, url)
+        content_type 'text/markdown'
+        Trifle::Docs::Helper::MarkdownLayout.render(
+          meta: meta,
+          raw_content: Trifle::Docs.raw_content(url: url),
+          sitemap: Trifle::Docs.sitemap
+        )
+      end
+
+      def render_html(meta, url)
+        erb (meta['template'] || 'page').to_sym, {}, {
+          sitemap: Trifle::Docs.sitemap,
+          collection: Trifle::Docs.collection(url: url),
+          content: Trifle::Docs.content(url: url),
+          meta: meta,
+          url: url
+        }
+      end
+
+      def render_generated_sitemap
+        content = Trifle::Docs::Helper::Sitemap.xml
+        halt(404, 'Not Found') if content.nil? || content.strip.empty?
+
+        content_type 'application/xml'
+        content
+      end
+
+      private :handle_request
     end
   end
 end
