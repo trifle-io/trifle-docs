@@ -49,19 +49,24 @@ module Trifle
         end
 
         def format_page(meta:, url:, raw_content:)
-          title = meta['title'] || Trifle::Docs::Helper::MarkdownLayout.derive_title_from_url(url)
-          page_url = meta['url'] || "/#{url}"
-
-          lines = []
-          lines << "# #{title}"
-          lines << ''
-          lines << "Source: #{page_url}"
-          lines << ''
+          lines = page_header(meta: meta, url: url)
           lines << raw_content.to_s.strip
           lines << ''
           lines << '---'
 
           lines.join("\n")
+        end
+
+        def page_header(meta:, url:)
+          title = meta['title'] || Trifle::Docs::Helper::MarkdownLayout.derive_title_from_url(url)
+          page_url = meta['url'] || "/#{url}"
+
+          [
+            "# #{title}",
+            '',
+            "Source: #{page_url}",
+            ''
+          ]
         end
       end
     end

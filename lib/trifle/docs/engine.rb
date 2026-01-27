@@ -63,33 +63,24 @@ if Object.const_defined?('Rails')
         end
 
         def llms
-          meta = Trifle::Docs.meta(url: 'llms.txt', config: configuration)
-          if meta && meta['type'] == 'file'
-            send_file(meta['path'])
-            return
+          render_llms('llms.txt', allow_empty: true) do
+            Trifle::Docs::Helper::Llms.homepage_markdown(config: configuration)
           end
-
-          content = Trifle::Docs::Helper::Llms.homepage_markdown(config: configuration)
-          if content.nil?
-            render_not_found
-            return
-          end
-
-          render plain: content, content_type: 'text/markdown'
         end
 
         def llms_full
-          meta = Trifle::Docs.meta(url: 'llms-full.txt', config: configuration)
-          if meta && meta['type'] == 'file'
-            send_file(meta['path'])
-            return
+          render_llms('llms-full.txt') do
+            Trifle::Docs::Helper::Llms.full_markdown(config: configuration)
           end
+        end
 
-          content = Trifle::Docs::Helper::Llms.full_markdown(config: configuration)
-          if content.nil? || content.strip.empty?
-            render_not_found
-            return
-          end
+        def render_llms(url, allow_empty: false)
+          meta = Trifle::Docs.meta(url: url, config: configuration)
+          return send_file(meta['path']) if meta && meta['type'] == 'file'
+
+          content = yield
+          return render_not_found if content.nil?
+          return render_not_found if !allow_empty && content.strip.empty?
 
           render plain: content, content_type: 'text/markdown'
         end
@@ -119,6 +110,8 @@ if Object.const_defined?('Rails')
             sitemap: Trifle::Docs.sitemap(config: configuration)
           ), content_type: 'text/markdown'
         end
+
+        private :render_llms
       end
     end
   end

@@ -27,9 +27,7 @@ module Trifle
 
       get '/llms.txt' do
         meta = Trifle::Docs.meta(url: 'llms.txt')
-        if meta && meta['type'] == 'file'
-          return send_file(meta['path'])
-        end
+        return send_file(meta['path']) if meta && meta['type'] == 'file'
 
         content = Trifle::Docs::Helper::Llms.homepage_markdown
         halt(404, 'Not Found') if content.nil?
@@ -40,9 +38,7 @@ module Trifle
 
       get '/llms-full.txt' do
         meta = Trifle::Docs.meta(url: 'llms-full.txt')
-        if meta && meta['type'] == 'file'
-          return send_file(meta['path'])
-        end
+        return send_file(meta['path']) if meta && meta['type'] == 'file'
 
         content = Trifle::Docs::Helper::Llms.full_markdown
         halt(404, 'Not Found') if content.nil? || content.strip.empty?
