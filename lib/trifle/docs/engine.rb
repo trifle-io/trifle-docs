@@ -19,6 +19,8 @@ if Object.const_defined?('Rails')
             root to: 'page#show'
             get 'llms.txt', to: 'page#llms'
             get 'llms-full.txt', to: 'page#llms_full'
+            get '*path/llms.txt', to: 'page#llms'
+            get '*path/llms-full.txt', to: 'page#llms_full'
             get 'sitemap.xml', to: 'page#sitemap'
             get 'search', to: 'page#search'
             get '*url', to: 'page#show'
@@ -71,8 +73,7 @@ if Object.const_defined?('Rails')
         def render_markdown(url:, meta:)
           render plain: Trifle::Docs::Helper::MarkdownLayout.render(
             meta: meta,
-            raw_content: Trifle::Docs.raw_content(url: url, config: configuration),
-            sitemap: Trifle::Docs.sitemap(config: configuration)
+            raw_content: Trifle::Docs.raw_content(url: url, config: configuration)
           ), content_type: markdown_content_type
         end
 
@@ -98,6 +99,10 @@ if Object.const_defined?('Rails')
           wants_md = markdown_requested?(format, request)
           url = wants_md ? raw_url : [raw_url, format].compact.join('.')
           [url, wants_md]
+        end
+
+        def llms_scope
+          params[:path].to_s.gsub(%r{^/+}, '').gsub(%r{/+$}, '')
         end
 
         def render_markdown?(meta, wants_md, request)
@@ -166,14 +171,24 @@ if Object.const_defined?('Rails')
         end
 
         def llms
-          render_llms('llms.txt', allow_empty: true) do
-            Trifle::Docs::Helper::Llms.homepage_markdown(config: configuration)
+          base_url = llms_scope
+          llms_url = [base_url, 'llms.txt'].reject(&:empty?).join('/')
+          render_llms(llms_url, allow_empty: true) do
+            Trifle::Docs::Helper::Llms.homepage_markdown(
+              config: configuration,
+              base_url: base_url
+            )
           end
         end
 
         def llms_full
-          render_llms('llms-full.txt') do
-            Trifle::Docs::Helper::Llms.full_markdown(config: configuration)
+          base_url = llms_scope
+          llms_url = [base_url, 'llms-full.txt'].reject(&:empty?).join('/')
+          render_llms(llms_url) do
+            Trifle::Docs::Helper::Llms.full_markdown(
+              config: configuration,
+              base_url: base_url
+            )
           end
         end
 

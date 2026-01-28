@@ -6,14 +6,11 @@ module Trifle
       module MarkdownLayout
         module_function
 
-        def render(meta:, raw_content:, sitemap:) # rubocop:disable Metrics/MethodLength
+        def render(meta:, raw_content:)
           lines = []
           title = meta['title'] || derive_title_from_url(meta['url'])
 
           lines << "# #{title}"
-          lines << ''
-          lines << '## Navigation'
-          lines << navigation_toc(sitemap)
           lines << ''
           lines << '## Content'
           lines << raw_content.to_s.strip

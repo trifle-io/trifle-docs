@@ -6,32 +6,56 @@ module Trifle
       module Llms
         module_function
 
-        def homepage_markdown(config: nil)
-          meta = Trifle::Docs.meta(url: '', config: config)
+        def homepage_markdown(config: nil, base_url: '')
+          base_url = normalize_base_url(base_url)
+          meta = Trifle::Docs.meta(url: base_url, config: config)
           return nil if meta.nil?
 
           Trifle::Docs::Helper::MarkdownLayout.render(
             meta: meta,
-            raw_content: Trifle::Docs.raw_content(url: '', config: config),
-            sitemap: Trifle::Docs.sitemap(config: config)
+            raw_content: Trifle::Docs.raw_content(url: base_url, config: config)
           )
         end
 
-        def full_markdown(config: nil)
+        def full_markdown(config: nil, base_url: '')
+          pages = llms_pages(config: config, base_url: base_url)
+          return nil if pages.nil?
+
+          pages.filter_map { |page| render_llms_page(page, config: config) }
+               .join("\n\n")
+        end
+
+        def llms_pages(config:, base_url:)
+          base_url = normalize_base_url(base_url)
           sitemap = Trifle::Docs.sitemap(config: config)
-          pages = flatten_sitemap(sitemap)
+          scoped_sitemap = sitemap_subtree(sitemap, base_url)
+          return nil if scoped_sitemap.nil?
 
-          chunks = pages.filter_map do |page|
-            meta = page[:meta]
-            next if meta.nil? || meta['type'] == 'file'
+          path = base_url.empty? ? [] : base_url.split('/')
+          flatten_sitemap(scoped_sitemap, path)
+        end
 
-            raw = Trifle::Docs.raw_content(url: page[:url], config: config)
-            next if raw.nil? || raw.strip.empty?
+        def render_llms_page(page, config:)
+          meta = page[:meta]
+          return nil if meta.nil? || meta['type'] == 'file'
 
-            format_page(meta: meta, url: page[:url], raw_content: raw)
-          end
+          raw = Trifle::Docs.raw_content(url: page[:url], config: config)
+          return nil if raw.nil? || raw.strip.empty?
 
-          chunks.join("\n\n")
+          format_page(meta: meta, url: page[:url], raw_content: raw)
+        end
+
+        def sitemap_subtree(sitemap, base_url)
+          return nil unless sitemap.is_a?(Hash)
+
+          base_url = normalize_base_url(base_url)
+          return sitemap if base_url.empty?
+
+          sitemap.dig(*base_url.split('/'))
+        end
+
+        def normalize_base_url(base_url)
+          base_url.to_s.gsub(%r{^/+}, '').gsub(%r{/+$}, '')
         end
 
         def flatten_sitemap(node, path = [])
