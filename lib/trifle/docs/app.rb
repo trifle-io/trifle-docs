@@ -32,7 +32,7 @@ module Trifle
         content = Trifle::Docs::Helper::Llms.homepage_markdown
         halt(404, 'Not Found') if content.nil?
 
-        content_type 'text/markdown'
+        content_type 'text/plain'
         content
       end
 
@@ -43,7 +43,7 @@ module Trifle
         content = Trifle::Docs::Helper::Llms.full_markdown
         halt(404, 'Not Found') if content.nil? || content.strip.empty?
 
-        content_type 'text/markdown'
+        content_type 'text/plain'
         content
       end
 
@@ -77,6 +77,7 @@ module Trifle
         meta = Trifle::Docs.meta(url: url)
         halt(404, 'Not Found') if meta.nil?
 
+        set_vary_header unless meta['type'] == 'file'
         return render_markdown(meta, url) if render_markdown?(meta, request, params)
         return send_file(meta['path']) if meta['type'] == 'file'
 
@@ -84,7 +85,7 @@ module Trifle
       end
 
       def render_markdown(meta, url)
-        content_type 'text/markdown'
+        content_type markdown_content_type(request)
         Trifle::Docs::Helper::MarkdownLayout.render(
           meta: meta,
           raw_content: Trifle::Docs.raw_content(url: url),
@@ -108,6 +109,25 @@ module Trifle
 
         content_type 'application/xml'
         content
+      end
+
+      def markdown_content_type(request)
+        return 'text/plain' if Trifle::Docs::Helper::AiDetection.ai_scraper?(request.user_agent)
+
+        'text/markdown'
+      end
+
+      def set_vary_header
+        headers['Vary'] = append_vary(headers['Vary'], 'User-Agent')
+        headers['Vary'] = append_vary(headers['Vary'], 'Accept')
+      end
+
+      def append_vary(existing, value)
+        values = existing.to_s.split(',').map(&:strip).reject(&:empty?)
+        return value if values.empty?
+        return existing if values.any? { |entry| entry.casecmp(value).zero? }
+
+        (values + [value]).join(', ')
       end
 
       private :handle_request

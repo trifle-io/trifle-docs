@@ -37,7 +37,7 @@ if Object.const_defined?('Rails')
           return render_not_found if content.nil?
           return render_not_found if !allow_empty && content.strip.empty?
 
-          render plain: content, content_type: 'text/markdown'
+          render plain: content, content_type: 'text/plain'
         end
 
         def render_sitemap(url)
@@ -73,7 +73,7 @@ if Object.const_defined?('Rails')
             meta: meta,
             raw_content: Trifle::Docs.raw_content(url: url, config: configuration),
             sitemap: Trifle::Docs.sitemap(config: configuration)
-          ), content_type: 'text/markdown'
+          ), content_type: markdown_content_type
         end
 
         def fetch_meta(url)
@@ -81,6 +81,7 @@ if Object.const_defined?('Rails')
         end
 
         def render_for_meta(meta, url, wants_md, request)
+          set_vary_header unless file_meta?(meta)
           return render_markdown(url: url, meta: meta) if render_markdown?(meta, wants_md, request)
           return render_file(meta: meta) if file_meta?(meta)
 
@@ -109,6 +110,25 @@ if Object.const_defined?('Rails')
           return true if format.to_s.downcase == 'md'
 
           request.headers['Accept'].to_s.include?('text/markdown')
+        end
+
+        def markdown_content_type
+          return 'text/plain' if Trifle::Docs::Helper::AiDetection.ai_scraper?(request.user_agent)
+
+          'text/markdown'
+        end
+
+        def set_vary_header
+          response.headers['Vary'] = append_vary(response.headers['Vary'], 'User-Agent')
+          response.headers['Vary'] = append_vary(response.headers['Vary'], 'Accept')
+        end
+
+        def append_vary(existing, value)
+          values = existing.to_s.split(',').map(&:strip).reject(&:empty?)
+          return value if values.empty?
+          return existing if values.any? { |entry| entry.casecmp(value).zero? }
+
+          (values + [value]).join(', ')
         end
       end
 
