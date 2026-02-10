@@ -3,13 +3,14 @@
 module Trifle
   module Docs
     class Configuration
-      attr_accessor :path, :views, :layout, :namespace, :cache
+      attr_accessor :path, :views, :layout, :namespace, :cache, :sitemap_base_url
 
       def initialize
         @harvesters = []
         @path = nil
         @namespace = nil
         @cache = true
+        @sitemap_base_url = nil
       end
 
       def harvester

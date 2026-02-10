@@ -41,6 +41,8 @@ require 'trifle/docs'
 Trifle::Docs.configure do |config|
   config.path = File.join(__dir__, 'docs')
   config.views = File.join(__dir__, 'templates')
+  # Optional: canonical base URL used for absolute <loc> values in sitemap.xml
+  # config.sitemap_base_url = ENV.fetch('TRIFLE_DOCS_SITEMAP_BASE_URL', nil)
   config.register_harvester(Trifle::Docs::Harvester::Markdown)
   config.register_harvester(Trifle::Docs::Harvester::File)
 end
@@ -109,6 +111,22 @@ There are several variables available in your template file (except `layout.erb`
 - **Flexible integration** - Works with Rack, Rails, Sinatra
 - **Caching support** - Optional caching for production environments
 - **Navigation helpers** - Automatic menu and breadcrumb generation
+
+## Sitemap URL configuration
+
+`/sitemap.xml` emits absolute URLs. By default, Trifle::Docs uses the incoming request host (`request.base_url`).
+
+If your app runs behind a proxy/ingress and you need a canonical public domain, set:
+
+```ruby
+config.sitemap_base_url = 'https://docs.trifle.io'
+```
+
+In containerized deployments you can wire this through an env var, for example:
+
+```ruby
+config.sitemap_base_url = ENV.fetch('TRIFLE_DOCS_SITEMAP_BASE_URL', nil)
+```
 
 ## Harvesters
 

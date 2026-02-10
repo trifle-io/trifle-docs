@@ -49,7 +49,8 @@ module Trifle
       end
 
       def render_generated_sitemap
-        content = Trifle::Docs::Helper::Sitemap.xml
+        base_url = Trifle::Docs.default.sitemap_base_url || request.base_url
+        content = Trifle::Docs::Helper::Sitemap.xml(base_url: base_url)
         halt(404, 'Not Found') if content.nil? || content.strip.empty?
 
         content_type 'application/xml'

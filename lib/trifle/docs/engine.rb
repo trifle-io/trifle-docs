@@ -193,8 +193,9 @@ if Object.const_defined?('Rails')
         end
 
         def sitemap
+          base_url = configuration.sitemap_base_url || request.base_url
           render_sitemap('sitemap.xml') do
-            Trifle::Docs::Helper::Sitemap.xml(config: configuration)
+            Trifle::Docs::Helper::Sitemap.xml(config: configuration, base_url: base_url)
           end
         end
       end
