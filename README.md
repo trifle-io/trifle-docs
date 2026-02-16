@@ -80,7 +80,7 @@ Template variables: `sitemap`, `collection`, `content`, `meta`.
 
 ## Documentation
 
-Full guides and API reference at **[trifle.io/trifle-docs](https://trifle.io/trifle-docs)**
+Full guides and API reference at **[docs.trifle.io/trifle-docs](https://docs.trifle.io/trifle-docs)**
 
 ## Trifle Ecosystem
 
