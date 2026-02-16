@@ -3,35 +3,17 @@
 [![Gem Version](https://badge.fury.io/rb/trifle-docs.svg)](https://rubygems.org/gems/trifle-docs)
 [![Ruby](https://github.com/trifle-io/trifle-docs/workflows/Ruby/badge.svg?branch=main)](https://github.com/trifle-io/trifle-docs)
 
-Simple router for your static documentation. Like markdown, or textile, or whatever files. It maps your docs folder structure into URLs and renders them within the simplest template possible.
+Simple router for static documentation. Map a folder of Markdown, textile, or other files to URLs and render them with minimal templates. Drop it into Rack, Rails, or Sinatra.
 
-## Documentation
-
-For comprehensive guides, API reference, and examples, visit [trifle.io/trifle-docs](https://trifle.io/trifle-docs)
+Part of the [Trifle](https://trifle.io) ecosystem.
 
 ![Demo App](demo.gif)
 
-## Installation
-
-Add this line to your application's Gemfile:
+## Quick Start
 
 ```ruby
 gem 'trifle-docs'
 ```
-
-And then execute:
-
-```bash
-$ bundle install
-```
-
-Or install it yourself as:
-
-```bash
-$ gem install trifle-docs
-```
-
-## Quick Start
 
 ### 1. Configure
 
@@ -41,8 +23,6 @@ require 'trifle/docs'
 Trifle::Docs.configure do |config|
   config.path = File.join(__dir__, 'docs')
   config.views = File.join(__dir__, 'templates')
-  # Optional: canonical base URL used for absolute <loc> values in sitemap.xml
-  # config.sitemap_base_url = ENV.fetch('TRIFLE_DOCS_SITEMAP_BASE_URL', nil)
   config.register_harvester(Trifle::Docs::Harvester::Markdown)
   config.register_harvester(Trifle::Docs::Harvester::File)
 end
@@ -61,96 +41,56 @@ docs/
     └── reference.md
 ```
 
-### 3. Use in your application
+### 3. Mount in your app
 
 ```ruby
-# As Rack middleware
+# Rack middleware
 use Trifle::Docs::Middleware
 
-# Or mount in Rails
+# Rails
 Rails.application.routes.draw do
   mount Trifle::Docs::Engine => '/docs'
 end
-
-# Or Sinatra app
 ```
 
 ### 4. Templates
 
-Please create two files in folder you provided the configuration.
-
-```ruby
-# templates/layout.erb
+```erb
+<!-- templates/layout.erb -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Trifle::Docs</title>
-  </head>
-  <body>
-    <%= yield %>
-  </body>
+  <head><title>Docs</title></head>
+  <body><%= yield %></body>
 </html>
 
-# templates/page.erb
+<!-- templates/page.erb -->
 <%= content %>
 ```
 
-#### Template variables
-
-There are several variables available in your template file (except `layout.erb`).
-- `sitemap` - complete sitemap tree of the folder.
-- `collection` - current subtree of the folder (useful for rendering child content, aka collection).
-- `content` - rendered markdown file.
-- `meta` - metadata from markdown file.
+Template variables: `sitemap`, `collection`, `content`, `meta`.
 
 ## Features
 
-- **File-based routing** - Maps folder structure to URL paths
-- **Multiple harvesters** - Markdown, textile, and custom file processors
-- **Template system** - ERB templates with layout support
-- **Flexible integration** - Works with Rack, Rails, Sinatra
-- **Caching support** - Optional caching for production environments
-- **Navigation helpers** - Automatic menu and breadcrumb generation
+- **File-based routing** — Folder structure becomes URL paths
+- **Multiple harvesters** — Markdown (with frontmatter), static files, custom processors
+- **Template system** — ERB templates with layout support
+- **Flexible integration** — Rack, Rails, Sinatra
+- **Navigation helpers** — Automatic menu and breadcrumb generation
+- **Sitemap XML** — Auto-generated with configurable base URL
 
-## Sitemap URL configuration
+## Documentation
 
-`/sitemap.xml` emits absolute URLs. By default, Trifle::Docs uses the incoming request host (`request.base_url`).
+Full guides and API reference at **[trifle.io/trifle-docs](https://trifle.io/trifle-docs)**
 
-If your app runs behind a proxy/ingress and you need a canonical public domain, set:
+## Trifle Ecosystem
 
-```ruby
-config.sitemap_base_url = 'https://docs.trifle.io'
-```
-
-In containerized deployments you can wire this through an env var, for example:
-
-```ruby
-config.sitemap_base_url = ENV.fetch('TRIFLE_DOCS_SITEMAP_BASE_URL', nil)
-```
-
-## Harvesters
-
-Trifle::Docs supports multiple content processors:
-
-- **Markdown** - Process `.md` files with frontmatter support
-- **File** - Handle static assets and non-markdown content
-- **Custom** - Build your own harvesters for specialized content
-
-## Testing
-
-Tests focus on documenting behavior and ensuring reliability. To run the test suite:
-
-```bash
-$ bundle exec rspec
-```
-
-Tests are meant to be **simple and isolated**. Every test should be **independent** and able to run in any order. Tests should be **self-contained** and set up their own configuration.
-
-Use **single layer testing** to focus on testing a specific class or module in isolation. Use **appropriate stubbing** for file system operations when testing harvesters and routing logic.
-
-**Repeat yourself** in test setup for clarity rather than complex shared setups that can hide dependencies.
-
-Tests verify that file system changes are properly reflected in the documentation routing and that templates render correctly with provided content.
+| Component | What it does |
+|-----------|-------------|
+| **[Trifle App](https://trifle.io/product-app)** | Dashboards, alerts, scheduled reports, AI-powered chat. |
+| **[Trifle::Stats](https://github.com/trifle-io/trifle-stats)** | Time-series metrics for Ruby (Postgres, Redis, MongoDB, MySQL, SQLite). |
+| **[Trifle CLI](https://github.com/trifle-io/trifle-cli)** | Terminal access to metrics. MCP server mode for AI agents. |
+| **[Trifle::Traces](https://github.com/trifle-io/trifle-traces)** | Structured execution tracing for background jobs. |
+| **[Trifle::Logs](https://github.com/trifle-io/trifle-logs)** | File-based log storage with ripgrep-powered search. |
 
 ## Contributing
 
