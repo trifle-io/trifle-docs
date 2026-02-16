@@ -71,12 +71,12 @@ Template variables: `sitemap`, `collection`, `content`, `meta`.
 
 ## Features
 
-- **File-based routing** — Folder structure becomes URL paths
-- **Multiple harvesters** — Markdown (with frontmatter), static files, custom processors
-- **Template system** — ERB templates with layout support
-- **Flexible integration** — Rack, Rails, Sinatra
-- **Navigation helpers** — Automatic menu and breadcrumb generation
-- **Sitemap XML** — Auto-generated with configurable base URL
+- **File-based routing.** Folder structure becomes URL paths.
+- **Multiple harvesters.** Markdown (with frontmatter), static files, custom processors.
+- **Template system.** ERB templates with layout support.
+- **Flexible integration.** Rack, Rails, Sinatra.
+- **Navigation helpers.** Automatic menu and breadcrumb generation.
+- **Sitemap XML.** Auto-generated with configurable base URL.
 
 ## Documentation
 
@@ -86,7 +86,7 @@ Full guides and API reference at **[docs.trifle.io/trifle-docs](https://docs.tri
 
 | Component | What it does |
 |-----------|-------------|
-| **[Trifle App](https://trifle.io/product-app)** | Dashboards, alerts, scheduled reports, AI-powered chat. |
+| **[Trifle App](https://trifle.io/product/app)** | Dashboards, alerts, scheduled reports, AI-powered chat. |
 | **[Trifle::Stats](https://github.com/trifle-io/trifle-stats)** | Time-series metrics for Ruby (Postgres, Redis, MongoDB, MySQL, SQLite). |
 | **[Trifle CLI](https://github.com/trifle-io/trifle-cli)** | Terminal access to metrics. MCP server mode for AI agents. |
 | **[Trifle::Traces](https://github.com/trifle-io/trifle-traces)** | Structured execution tracing for background jobs. |
